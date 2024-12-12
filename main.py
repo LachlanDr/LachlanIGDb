@@ -50,11 +50,11 @@ def Register():
        
     return render_template("register.html")
 
+##################################
+### New code starts here
+##################################
 @app.route("/add", methods=["GET","POST"])
 def Add():
-    # Check if they are logged in first
-    if session.get('username') == None:
-        return redirect("/")
 
     # Did they click submit?
     if request.method == "POST":
@@ -68,4 +68,10 @@ def Add():
 
     return render_template("add.html")
 
+
+##################################
+### New code ends here
+##################################
+
 app.run(debug=True, port=5000)
+
