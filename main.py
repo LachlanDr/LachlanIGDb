@@ -1,77 +1,131 @@
-from flask import Flask, render_template, request, session, redirect
+import os
+import sqlite3
+
+from flask import Flask, flash, redirect, render_template, request, session
+from werkzeug.security import check_password_hash, generate_password_hash
+
 import db
 
 app = Flask(__name__)
-app.secret_key = "gtg"
+app.secret_key = "gtg" 
+
+
+def GetDB():
+    """Connect to the database and return the connection object."""
+    db = sqlite3.connect(".database/gtg.db")
+    db.row_factory = sqlite3.Row
+    return db
+
+def CheckLogin(username, password):
+    """Check if the provided username and password match a user in the database."""
+    db = GetDB()
+    try:
+        user = db.execute("SELECT * FROM Users WHERE username=?", (username,)).fetchone()
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        db.close()
+
+    if user is not None:
+
+        if check_password_hash(user['password'], password):
+            return user
+    return None
+
+def RegisterUser(username, password):
+    """Register a new user in the database."""
+    if not username or not password:
+        return False
+
+    db = GetDB()
+    try:
+        existing_user = db.execute("SELECT * FROM Users WHERE username = ?", (username,)).fetchone()
+        if existing_user:
+            return False
+
+
+        hash = generate_password_hash(password)
+        db.execute("INSERT INTO Users(username, password) VALUES(?, ?)", (username, hash))
+        db.commit()
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        return False
+    finally:
+        db.close()
+
+    return True
+
 
 @app.route("/")
-def Home():
-    guessData = db.GetAllGuesses()
-    return render_template("index.html", guesses=guessData)
+def home():
+    """Home page displaying the newest reviews."""
 
-@app.route("/login", methods=["GET", "POST"])
-def Login():
 
-    # They sent us data, get the username and password
-    # then check if their details are correct.
-    if request.method == "POST":
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        # Did they provide good details
-        user = db.CheckLogin(username, password)
+        user = CheckLogin(username, password)
         if user:
-            # Yes! Save their username then
-            session['username'] = user['username']
+            session['username'] = username
             session['id'] = user['id']
+            flash('Logged in successfully!', 'success')
+            return redirect('/')
+        else:
+            flash('Invalid credentials, please try again.', 'danger')
+    return render_template('login.html')
 
-            # Send them back to the homepage
-            return redirect("/")
+@app.route('/logout')
+def logout():
+    session.pop('username', None) 
+    session.pop('id', None)  
+    flash('Logged out successfully!', 'success')
+    return redirect('/')
 
-    return render_template("login.html")
 
-@app.route("/logout")
-def Logout():
-    session.clear()
-    return redirect("/")
+@app.route('/profile')
+def profile():
+    """Display the user's profile, including their reviews."""
+    if 'id' not in session:
+        flash("You need to be logged in to view your profile.", "danger")
+        return redirect('/login')
 
-@app.route("/register", methods=["GET", "POST"])
-def Register():
+    user_id = session['id']
+    
+    db = GetDB()
+    try:
+        user_reviews = db.execute("""
+            SELECT Reviews.id, Reviews.date, Reviews.game, Reviews.review_text, Reviews.score 
+            FROM Reviews
+            WHERE user_id = ?
+            ORDER BY date DESC
+        """, (user_id,)).fetchall()
+        
+        user_info = db.execute("SELECT username FROM Users WHERE id = ?", (user_id,)).fetchone()
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        user_reviews = []
+        user_info = None
+    finally:
+        db.close()
+    
+    return render_template('profile.html', user=user_info, reviews=user_reviews)
 
-    # If they click the submit button, let's register
-    if request.method == "POST":
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        # Try and add them to the DB
-        if db.RegisterUser(username, password):
-            # Success! Let's go to the homepage
-            return redirect("/")
-       
-    return render_template("register.html")
+        if RegisterUser(username, password):
+            flash('Account created successfully!', 'success')
+            return redirect('/login')
+        else:
+            flash('Username already exists or invalid input, please try again.', 'danger')
+    return render_template('register.html')
 
-##################################
-### New code starts here
-##################################
-@app.route("/add", methods=["GET","POST"])
-def Add():
-
-    # Did they click submit?
-    if request.method == "POST":
-        user_id = session['id']
-        date = request.form['date']
-        game = request.form['game']
-        score = request.form['score']
-
-        # Send the data to add our new guess to the db
-        db.AddGuess(user_id, date, game, score)
-
-    return render_template("add.html")
-
-
-##################################
-### New code ends here
-##################################
-
-app.run(debug=True, port=5000)
-
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

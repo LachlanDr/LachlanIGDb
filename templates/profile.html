@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Profile</h2>
+    
+    <p>Welcome, <strong>{{ user.username }}</strong>!</p>
+
+    <h3>Your Reviews</h3>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>{{ review.game }}</strong> ({{ review.date }})
+                    <br>Score: {{ review.score }}<br>
+                    {{ review.review_text }}
+                    <br>
+
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You haven't written any reviews yet.</p>
+    {% endif %}
+
+    <h3>Update Username</h3>
+    <form action="/update_username" method="post">
+        <input type="text" name="new_username" placeholder="New username" required>
+        <button type="submit">Update</button>
+    </form>
+
+    <h3>Delete Account</h3>
+    <form action="/delete_account" method="post">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+            Delete Account
+        </button>
+    </form>
+{% endblock %}
