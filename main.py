@@ -57,9 +57,22 @@ def RegisterUser(username, password):
     return True
 
 
+def load_games_from_txt(filename):
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as file:
+            games = file.readlines()
+        return [game.strip() for game in games]
+    return []
+
+def search_games(query):
+    games = load_games_from_txt("G:/My Drive/IST - 12/Assignment/Game Review/TextDump_GameOnly.txt")
+    return [game for game in games if query.lower() in game.lower()]  
+
+
 @app.route("/")
 def home():
     """Home page displaying the newest reviews."""
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -85,6 +98,23 @@ def logout():
     flash('Logged out successfully!', 'success')
     return redirect('/')
 
+
+@app.route('/write_review/<game_name>', methods=['GET', 'POST'])
+def write_review(game_name):
+    if request.method == 'POST':
+        review_text = request.form['review']
+        user_id = session.get('id') 
+        score = request.form['rating']  
+        
+
+        if db.AddReview(user_id, game_name, review_text, score):
+            flash(f'Review for {game_name} submitted!', 'success')
+        else:
+            flash('There was an issue submitting your review. Please try again.', 'danger')
+        
+        return redirect('/search')  
+
+    return render_template('write_review.html', game_name=game_name)
 
 @app.route('/profile')
 def profile():
@@ -113,6 +143,7 @@ def profile():
         db.close()
     
     return render_template('profile.html', user=user_info, reviews=user_reviews)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
