@@ -69,9 +69,29 @@ def search_games(query):
     return [game for game in games if query.lower() in game.lower()]  
 
 
+def GetLatestReviews():
+    """Fetch the last 3 reviews from the database, ordered by date."""
+    db = GetDB()
+    try:
+        reviews = db.execute(""" 
+            SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+            FROM Reviews 
+            JOIN Users ON Reviews.user_id = Users.id 
+            ORDER BY Reviews.date DESC 
+            LIMIT 3 
+        """).fetchall()
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        return []
+    finally:
+        db.close()
+    return reviews
+
 @app.route("/")
 def home():
     """Home page displaying the newest reviews."""
+    reviews = GetLatestReviews()
+    return render_template("index.html", reviews=reviews)
 
 
 
