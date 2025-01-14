@@ -4,46 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <!-- This line blocks cross site scripting -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
 
-    <title>GuessThe.Game DB</title>
+    <title>IGDb</title>
 
-    <link rel="stylesheet" href="static/css/style.css" />
-    <link rel="manifest" href="static/manifest.json" />
-    <link rel="icon" type="image/x-icon" href="static/images/favicon.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}" />
 </head>
 
 <body>
+    <header>
+        <h1 class="banner" style="background-image: url(../static/images/sonic.jpg);">IGDb</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/search">Search Games</a>
+            <a href="/reviews">All Reviews</a>
+            
+            {% if session.get('username') %}
+                <a href="/profile">
+                    <button>Profile</button>
+                </a>
+                <a href="/logout">
+                    <button>Logout</button>
+                </a>
+                <a href="/search?query">
+                    <button>Review</button>
+                </a>
+            {% else %}
+                <a href="/login">
+                    <button>Login</button>
+                </a>
+                <a href="/register">
+                    <button>Register</button>
+                </a>
+            {% endif %}
+        </nav>
+    </header>
 
-    <h1 class="banner">GuessThe.Game Database</h1>
-
-    <!-- Include a navigation menu -->
-    <nav>
-        <a href="/">Home</a>
-        <!-- -------------------- -->
-        <!-- New code starts here -->
-        <!-- -------------------- -->
-        {% if not session['username'] %}
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        {% else %}
-            <a href="/logout">Logout</a>
-        {% endif %}
-        <!-- -------------------- -->
-        <!-- New code ends here   -->
-        <!-- -------------------- -->
-    </nav>
-
-    <!-- This section will contain the page content -->
     <main>
         {% block content %}
-
         {% endblock %}
     </main>
 
-    <!-- This script will be for the service worker -->
-    <script src="static/js/app.js"></script>
-    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

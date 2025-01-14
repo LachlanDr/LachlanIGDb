@@ -93,7 +93,11 @@ def home():
     reviews = GetLatestReviews()
     return render_template("index.html", reviews=reviews)
 
-
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query', '')
+    games = search_games(query) if query else []
+    return render_template('search.html', games=games, query=query)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -163,6 +167,43 @@ def profile():
         db.close()
     
     return render_template('profile.html', user=user_info, reviews=user_reviews)
+
+@app.route('/reviews', methods=['GET'])
+def reviews():
+    """Fetch all reviews from the database, optionally filtered by search query."""
+    query = request.args.get('query', '').lower()  
+
+    db = GetDB()
+    try:
+        if query:
+
+            all_reviews = db.execute(""" 
+                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+                FROM Reviews 
+                JOIN Users ON Reviews.user_id = Users.id 
+                WHERE LOWER(Reviews.game) LIKE ? 
+                   OR LOWER(Reviews.review_text) LIKE ? 
+                   OR LOWER(Users.username) LIKE ?
+                ORDER BY Reviews.date DESC
+            """, ('%' + query + '%', '%' + query + '%', '%' + query + '%')).fetchall()
+        else:
+
+            all_reviews = db.execute(""" 
+                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+                FROM Reviews 
+                JOIN Users ON Reviews.user_id = Users.id 
+                ORDER BY Reviews.date DESC
+            """).fetchall()
+
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        all_reviews = []
+    finally:
+        db.close()
+    
+    return render_template('reviews.html', reviews=all_reviews, query=query)
+
+
 
 
 @app.route('/register', methods=['GET', 'POST'])

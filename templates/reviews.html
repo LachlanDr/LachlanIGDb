@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>All Reviews</h2>
+
+    <form action="{{ url_for('reviews') }}" method="get">
+        <input type="text" name="query" placeholder="Search reviews..." value="{{ request.args.get('query', '') }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <div class="review">
+                    <h3>{{ review.game }}</h3>
+                    <p>{{ review.review_text }}</p>
+                    <p>Score: {{ review.score }} - Reviewed by <b>{{ review.username }}</b> on {{ review.date }}</p>
+                    <p>------------------------</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
