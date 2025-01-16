@@ -205,6 +205,57 @@ def reviews():
 
 
 
+@app.route('/update_username', methods=['POST'])
+def update_username():
+    """Allow the user to update their username."""
+    if 'id' not in session:
+        flash("You must be logged in to update your username.", "danger")
+        return redirect('/login')
+
+    new_username = request.form['new_username']
+    user_id = session['id']
+
+    db = GetDB()
+    try:
+        existing_user = db.execute("SELECT id FROM Users WHERE username = ?", (new_username,)).fetchone()
+        if existing_user:
+            flash("Username already taken. Please choose another.", "danger")
+        else:
+            db.execute("UPDATE Users SET username = ? WHERE id = ?", (new_username, user_id))
+            db.commit()
+            session['username'] = new_username 
+            flash("Username updated successfully!", "success")
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        flash("An error occurred while updating your username.", "danger")
+    finally:
+        db.close()
+
+    return redirect('/profile')
+
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    """Allow the user to delete their account."""
+    if 'id' not in session:
+        flash("You must be logged in to delete your account.", "danger")
+        return redirect('/login')
+
+    user_id = session['id']
+
+    db = GetDB()
+    try:
+        db.execute("DELETE FROM Users WHERE id = ?", (user_id,))
+        db.commit()
+        session.clear() 
+        flash("Your account has been deleted.", "success")
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        flash("An error occurred while deleting your account.", "danger")
+    finally:
+        db.close()
+
+    return redirect('/')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
