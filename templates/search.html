@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Search Results</h2>
+
+<form action="/search" method="get">
+    <input type="text" name="query" placeholder="Search for games..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<table class="game_table">
+    <thead>
+        <tr>
+            <th>Game Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if games %}
+            {% for game in games %}
+            <tr>
+                <td>{{ game }}</td>
+                <td>
+                    {% if session.get('username') %}
+
+                        <a href="{{ url_for('write_review', game_name=game) }}">
+                            <button>Write Review</button>
+                        </a>
+                    {% else %}
+ 
+                        <p>Please log in to write a review.</p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+
+            <tr>
+                <td colspan="2">No games found.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% endblock %}
