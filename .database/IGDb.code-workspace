@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "../../GitHub/IGDb"
+		},
+		{
+			"path": "../static"
+		},
+		{
+			"path": "../templates"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../.git"
+		},
+		{
+			"path": "../.workingdocuments"
+		},
+		{
+			"path": "../__pycache__"
+		},
+		{
+			"path": "../GuessThe.Game DB_files"
+		}
+	],
+	"settings": {}
+}

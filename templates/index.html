@@ -1,43 +1,88 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h2>Add a new guess</h2>
-<div class="container">
+    <h2>Welcome to IGDb - Internet Game Database</h2>
 
-    <p>Welcome to GuessThe.Game Database (aka. GTGDB). This website is dedicated to the hard working Year 12 SE students of 2024-2025. The last 5 minutes of class are always a flurry of excitement and hard work. They open <a href="https://guessthe.game/">GuessThe.Game</a> and scream their suggestions at the host. Let's start tracking their progress.</p>
+    <div class="container">
+        <p>Welcome to IGDb. The magnum opus of exemplary reviews.</p>
 
-    {% if session['username'] %}
-        <br>
-        <p>Hello {{ session['username'] }}</p>
-
-        <a href="/add"><button>Add guess</button></a>
-
+        {% if session.get('username') %}
+            <br>
+            <p>Hello {{ session['username'] }}!</p>
+        {% else %}
+            <p>Please log in to write a review.</p>
+            <a href="/login"><button>Login</button></a>
+        {% endif %}
+    </div>
+    {% if session.get('username') %}
+    <div style="position: absolute; top: 10px; right: 10px;">
+        <a href="/profile"><button>Profile</button></a>
+    </div>
     {% endif %}
 
-</div>
+    <br>
 
-<br>
+    <form action="/search" method="get">
+        <input type="text" name="query" placeholder="Search for games..." value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
 
-<table class="guess_table">
+    <hr>
 
-    <thead>
-        <th>Date</th>
-        <th>User who guessed</th>
-        <th>Game</th>
-        <th>Score</th>
-    </thead>
+    <h2>Latest Reviews</h2>
 
-    <tbody>
-        {% for guess in guesses %}
-        <tr>
-            <td>{{ guess['date'] }}</td>
-            <td>{{ guess['username'] }}</td>
-            <td>{{ guess['game'] }}</td>
-            <td>{{ guess['score'] }}</td>
-        </tr>
+    <div class="reviews-container">
+        {% for review in reviews %}
+            <div class="review">
+                <h3>{{ review.username }} - {{ review.game }}</h3>
+
+                <p>{{ review.review_text }}</p>
+                <p><strong>Rating:</strong>
+                    {% for i in range(1, review.score + 1) %}
+                        ★
+                    {% endfor %}
+                    {% for i in range(review.score + 1, 6) %}
+                        ☆
+                    {% endfor %}
+                </p>
+                <p><em>Reviewed on: {{ review.date }}</em></p>
+            </div>
         {% endfor %}
-    </tbody>
+    </div>
+{% endblock %}
 
-</table>
+{% block styles %}
+    <style>
+        .reviews-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
 
+        .review {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            width: 30%;
+            background-color: #f9f9f9;
+        }
+
+        .review h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .review p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .review strong {
+            font-weight: bold;
+        }
+
+        .review em {
+            font-style: italic;
+            font-size: 14px;
+        }
+    </style>
 {% endblock %}

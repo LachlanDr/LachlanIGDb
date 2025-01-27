@@ -11,6 +11,23 @@ def GetDB():
     db.row_factory = sqlite3.Row
     return db
 
+def GetAllGuesses():
+    """Query all guesses and return them."""
+    db = GetDB()
+    try:
+        guesses = db.execute("""
+            SELECT Guesses.date, Guesses.game, Guesses.score, Users.username
+            FROM Guesses
+            JOIN Users ON Guesses.user_id = Users.id
+            ORDER BY date DESC
+        """).fetchall()
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        return []
+    finally:
+        db.close()
+    return guesses
+
 def CheckLogin(username, password):
     """Check if the provided username and password match a user in the database."""
     db = GetDB()
