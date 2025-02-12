@@ -15,34 +15,26 @@
 
 <body>
     <header>
-        <h1 class="banner" style="background-image: url(../static/images/banner.jpg);">IGDb</h1>
+        <h1 class="banner">IGDb</h1> 
         <nav>
             <a href="/">Home</a>
             <a href="/search">Search Games</a>
             <a href="/reviews">All Reviews</a>
-            
+    
             {% if session.get('username') %}
-                <a href="/profile">
-                    <button>Profile</button>
-                </a>
-                <a href="/logout">
-                    <button>Logout</button>
-                </a>
-                <a href="/search?query">
-                    <button>Review</button>
-                </a>
+                <a href="/profile"><button>Profile</button></a>
+                <a href="/logout"><button>Logout</button></a>
+                <a href="/search?query"><button>Review</button></a>
             {% else %}
-                <a href="/login">
-                    <button>Login</button>
-                </a>
-                <a href="/register">
-                    <button>Register</button>
-                </a>
+                <a href="/login"><button>Login</button></a>
+                <a href="/register"><button>Register</button></a>
             {% endif %}
         </nav>
     </header>
+    
 
     <main>
+        
         {% block content %}
         {% endblock %}
     </main>

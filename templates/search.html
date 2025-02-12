@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="review-box">
 <h2>Search Results</h2>
 
 <form action="/search" method="get">
@@ -10,7 +11,8 @@
 
 {% if games %}
     {% for game in games %}
-    <div class="game-box">
+    
+    <div class="review-box">
         <p><strong>Game Name:</strong> {{ game }}</p>
         {% if session.get('username') %}
             <a href="{{ url_for('write_review', game_name=game) }}">
@@ -20,6 +22,7 @@
             <p>Please log in to write a review.</p>
         {% endif %}
     </div>
+</div>
     {% endfor %}
 {% else %}
     <p>No games found.</p>
