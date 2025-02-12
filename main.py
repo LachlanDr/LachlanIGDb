@@ -5,6 +5,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import db
+
 # //////////////////////////////
 # FLASK + SECRET KEY (APP FUNCTIONS)
 # //////////////////////////////
@@ -135,20 +136,24 @@ def logout():
 
 @app.route('/write_review/<game_name>', methods=['GET', 'POST'])
 def write_review(game_name):
+    if 'id' not in session:
+        flash("You need to be logged in to write a review.", "danger")
+        return redirect('/login')
+
     if request.method == 'POST':
         review_text = request.form['review']
         user_id = session.get('id') 
         score = request.form['rating']  
-        
 
         if db.AddReview(user_id, game_name, review_text, score):
             flash(f'Review for {game_name} submitted!', 'success')
         else:
             flash('There was an issue submitting your review. Please try again.', 'danger')
-        
+
         return redirect('/search')  
 
     return render_template('write_review.html', game_name=game_name)
+
 
 @app.route('/profile')
 def profile():
@@ -177,6 +182,11 @@ def profile():
         db.close()
     
     return render_template('profile.html', user=user_info, reviews=user_reviews)
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self';"
+    return response
 
 @app.route('/reviews', methods=['GET'])
 def reviews():
