@@ -1,9 +1,7 @@
 import os
 import sqlite3
-
 from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
-
 import db
 
 # //////////////////////////////
@@ -14,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = "gtg" 
 
 # //////////////////////////////
-# DEFINITIONS: USER AUTHENITCATION
+# DEFINITIONS: USER AUTHENTICATION
 # //////////////////////////////
 
 def GetDB():
@@ -34,10 +32,8 @@ def CheckLogin(username, password):
     finally:
         db.close()
 
-    if user is not None:
-
-        if check_password_hash(user['password'], password):
-            return user
+    if user is not None and check_password_hash(user['password'], password):
+        return user
     return None
 
 def RegisterUser(username, password):
@@ -50,7 +46,6 @@ def RegisterUser(username, password):
         existing_user = db.execute("SELECT * FROM Users WHERE username = ?", (username,)).fetchone()
         if existing_user:
             return False
-
 
         hash = generate_password_hash(password)
         db.execute("INSERT INTO Users(username, password) VALUES(?, ?)", (username, hash))
@@ -74,7 +69,6 @@ def load_games_from_txt(filename):
 def search_games(query):
     games = load_games_from_txt("G:/My Drive/IST - 12/Assignment/Game Review/TextDump_GameOnly.txt")
     return [game for game in games if query.lower() in game.lower()]  
-
 
 def GetLatestReviews():
     """Fetch the last 3 reviews from the database, ordered by date."""
@@ -133,7 +127,6 @@ def logout():
     flash('Logged out successfully!', 'success')
     return redirect('/')
 
-
 @app.route('/write_review/<game_name>', methods=['GET', 'POST'])
 def write_review(game_name):
     if 'id' not in session:
@@ -154,7 +147,6 @@ def write_review(game_name):
 
     return render_template('write_review.html', game_name=game_name)
 
-
 @app.route('/profile')
 def profile():
     """Display the user's profile, including their reviews."""
@@ -166,11 +158,11 @@ def profile():
     
     db = GetDB()
     try:
-        user_reviews = db.execute("""
+        user_reviews = db.execute(""" 
             SELECT Reviews.id, Reviews.date, Reviews.game, Reviews.review_text, Reviews.score 
             FROM Reviews
-            WHERE user_id = ?
-            ORDER BY date DESC
+            WHERE user_id = ? 
+            ORDER BY date DESC 
         """, (user_id,)).fetchall()
         
         user_info = db.execute("SELECT username FROM Users WHERE id = ?", (user_id,)).fetchone()
@@ -196,23 +188,21 @@ def reviews():
     db = GetDB()
     try:
         if query:
-
             all_reviews = db.execute(""" 
                 SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
                 FROM Reviews 
                 JOIN Users ON Reviews.user_id = Users.id 
                 WHERE LOWER(Reviews.game) LIKE ? 
                    OR LOWER(Reviews.review_text) LIKE ? 
-                   OR LOWER(Users.username) LIKE ?
-                ORDER BY Reviews.date DESC
+                   OR LOWER(Users.username) LIKE ? 
+                ORDER BY Reviews.date DESC 
             """, ('%' + query + '%', '%' + query + '%', '%' + query + '%')).fetchall()
         else:
-
             all_reviews = db.execute(""" 
                 SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
                 FROM Reviews 
                 JOIN Users ON Reviews.user_id = Users.id 
-                ORDER BY Reviews.date DESC
+                ORDER BY Reviews.date DESC 
             """).fetchall()
 
     except sqlite3.DatabaseError as e:
@@ -222,8 +212,6 @@ def reviews():
         db.close()
     
     return render_template('reviews.html', reviews=all_reviews, query=query)
-
-
 
 @app.route('/update_username', methods=['POST'])
 def update_username():
@@ -252,7 +240,6 @@ def update_username():
         db.close()
 
     return redirect('/profile')
-
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
@@ -289,6 +276,7 @@ def register():
         else:
             flash('Username already exists or invalid input, please try again.', 'danger')
     return render_template('register.html')
+
 # //////////////////////////////
 # BEGIN
 # //////////////////////////////

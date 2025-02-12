@@ -10,11 +10,20 @@
 
     <ul>
         {% for review in reviews %}
-                <div class="review-box">
-                    <h3>{{ review.game }}</h3>
-                    <p>{{ review.review_text }}</p>
-                    <p>Score: {{ review.score }} - Reviewed by <b>{{ review.username }}</b> on {{ review.date }}</p>
-                </div>
+        <div class="review-box">
+            <h3>{{ review.username }} - {{ review.game }}</h3>
+
+            <p>{{ review.review_text }}</p>
+            <p><strong>Rating:</strong>
+                {% for i in range(1, review.score + 1) %}
+                    ★
+                {% endfor %}
+                {% for i in range(review.score + 1, 6) %}
+                    ☆
+                {% endfor %}
+            </p>
+            <p><em>Reviewed on: {{ review.date }}</em></p>
+        </div>
         {% endfor %}
     </ul>
 {% endblock %}
