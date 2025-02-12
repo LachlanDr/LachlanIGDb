@@ -5,6 +5,10 @@ import random
 import io
 from datetime import datetime
 
+# //////////////////////////////
+# DEFINITIONS
+# //////////////////////////////
+
 def GetDB():
     """Connect to the database and return the connection object."""
     db = sqlite3.connect(".database/gtg.db")

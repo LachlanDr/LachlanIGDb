@@ -5,10 +5,16 @@ from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import db
+# //////////////////////////////
+# FLASK + SECRET KEY (APP FUNCTIONS)
+# //////////////////////////////
 
 app = Flask(__name__)
 app.secret_key = "gtg" 
 
+# //////////////////////////////
+# DEFINITIONS: USER AUTHENITCATION
+# //////////////////////////////
 
 def GetDB():
     """Connect to the database and return the connection object."""
@@ -86,6 +92,10 @@ def GetLatestReviews():
     finally:
         db.close()
     return reviews
+
+# //////////////////////////////
+# APP ROUTES: DISPLAY PAGES
+# //////////////////////////////
 
 @app.route("/")
 def home():
@@ -269,6 +279,8 @@ def register():
         else:
             flash('Username already exists or invalid input, please try again.', 'danger')
     return render_template('register.html')
-
+# //////////////////////////////
+# BEGIN
+# //////////////////////////////
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -10,14 +10,11 @@
 
     <ul>
         {% for review in reviews %}
-            <li>
-                <div class="review">
+                <div class="review-box">
                     <h3>{{ review.game }}</h3>
                     <p>{{ review.review_text }}</p>
                     <p>Score: {{ review.score }} - Reviewed by <b>{{ review.username }}</b> on {{ review.date }}</p>
-                    <p>------------------------</p>
                 </div>
-            </li>
         {% endfor %}
     </ul>
 {% endblock %}

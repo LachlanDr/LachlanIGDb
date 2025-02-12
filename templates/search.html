@@ -8,38 +8,21 @@
     <button type="submit">Search</button>
 </form>
 
-<table class="game_table">
-    <thead>
-        <tr>
-            <th>Game Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% if games %}
-            {% for game in games %}
-            <tr>
-                <td>{{ game }}</td>
-                <td>
-                    {% if session.get('username') %}
-
-                        <a href="{{ url_for('write_review', game_name=game) }}">
-                            <button>Write Review</button>
-                        </a>
-                    {% else %}
- 
-                        <p>Please log in to write a review.</p>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
+{% if games %}
+    {% for game in games %}
+    <div class="game-box">
+        <p><strong>Game Name:</strong> {{ game }}</p>
+        {% if session.get('username') %}
+            <a href="{{ url_for('write_review', game_name=game) }}">
+                <button>Write Review</button>
+            </a>
         {% else %}
-
-            <tr>
-                <td colspan="2">No games found.</td>
-            </tr>
+            <p>Please log in to write a review.</p>
         {% endif %}
-    </tbody>
-</table>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No games found.</p>
+{% endif %}
 
 {% endblock %}

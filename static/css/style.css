@@ -10,13 +10,14 @@ body {
     background: #fdfdfd;
     font-family: "Nunito", sans-serif;
     font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
 }
 
 main {
     max-width: 900px;
     margin: auto;
-    padding: 1rem;
-    line-height: 1.5;
+    padding: 1.5rem;
 }
 
 .banner {
@@ -25,21 +26,24 @@ main {
     background: #bc1a78;
     color: white;
     font-size: 3em;
+    font-weight: bold;
+    border-radius: 8px;
 }
 
 nav {
-    overflow: hidden;
     background-color: #333;
     text-align: center; 
+    padding: 0.5rem 0;
 }
 
 nav a {
     display: inline-block;
     color: #f2f2f2;
-
-    padding: 14px 16px;
+    padding: 14px 20px;
     text-decoration: none;
     font-size: 1.2em;
+    transition: background 0.3s ease, color 0.3s ease;
+    border-radius: 5px;
 }
 
 nav a:hover {
@@ -52,78 +56,98 @@ nav a.active {
     color: white;
 }
 
-
-
 .guess_table {
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .guess_table td, .guess_table th {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 12px;
 }
 
-.guess_table tr:nth-child(even){background-color: #f2f2f2;}
+.guess_table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
 
-.guess_table tr:hover {background-color: #ddd;}
+.guess_table tr:hover {
+    background-color: #e0e0e0;
+}
 
 .guess_table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
     background-color: #bc1a86;
     color: white;
+    padding: 14px;
+    text-align: left;
+    font-weight: bold;
 }
 
 input[type=text], input[type="password"], input[type="date"], input[type="number"], select {
     width: 100%;
-    padding: 12px 20px;
+    padding: 12px;
     margin: 8px 0;
-    display: inline-block;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
     box-sizing: border-box;
+    transition: border 0.3s ease;
 }
 
-input[type=submit] {
+input[type=text]:focus, input[type="password"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus {
+    border-color: #bc1a86;
+    outline: none;
+}
+
+input[type=submit], button {
     width: 100%;
     background-color: #af4c89;
     color: white;
-    padding: 14px 20px;
+    padding: 14px;
     margin: 8px 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1.05em;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
 }
 
-input[type=submit]:hover {
-    background-color: #a04572;
+input[type=submit]:hover, button:hover {
+    background-color: #922f6a;
 }
 
-button {
-    background-color: #af4c89;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.05em;
-}
 .star-rating {
     font-size: 40px;
     cursor: pointer;
+    display: flex;
+    gap: 5px;
+    justify-content: center;
 }
 
 .star-rating .star {
-    color: #ccc; /* Default empty star color */
-    transition: color 0.2s ease;
+    color: #ccc; 
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .star-rating .star:hover,
 .star-rating .star.selected {
-    color: gold; /* Filled star color */
+    color: gold;
+    transform: scale(1.1);
+}
+.review-box {
+    border: 2px solid #444; 
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+.game-box {
+    border: 2px solid #444; 
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15);
 }
