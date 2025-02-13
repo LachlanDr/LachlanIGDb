@@ -34,4 +34,8 @@
 --     developer TEXT,
 --     publisher TEXT
 -- );
--- DROP TABLE IF EXISTS Users;
+-- DROP TABLE IF EXISTS votes;
+-- ALTER TABLE Reviews ADD COLUMN upvotes INTEGER DEFAULT 0;
+-- ALTER TABLE Reviews ADD COLUMN downvotes INTEGER DEFAULT 0;
+
+ALTER TABLE Users ADD COLUMN profile_picture INTEGER DEFAULT 0;

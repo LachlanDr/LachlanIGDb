@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="review-box">
     <h2>Welcome to IGDb - Internet Game Database</h2>
@@ -14,6 +15,7 @@
             <a href="/login"><button>Login</button></a>
         {% endif %}
     </div>
+
     {% if session.get('username') %}
     <div style="position: absolute; top: 10px; right: 10px;">
         <a href="/profile"><button>Profile</button></a>
@@ -32,34 +34,45 @@
     <h2>Latest Reviews</h2>
 
     <div class="reviews-container">
-        {% for review in reviews %}
+        {% for review in reviews[:3] %}
             <div class="review-box">
-                <h3>{{ review.username }} - {{ review.game }}</h3>
-
-                <p>{{ review.review_text }}</p>
-                <p><strong>Rating:</strong>
-                    {% for i in range(1, review.score + 1) %}
-                        ★
-                    {% endfor %}
-                    {% for i in range(review.score + 1, 6) %}
-                        ☆
-                    {% endfor %}
-                </p>
-                <p><em>Reviewed on: {{ review.date }}</em></p>
+                <div class="review-header">
+                    {% if review.profile_picture and review.profile_picture != '0' %}
+                        <img class="pfp" src="/static/pfps/{{ review.profile_picture }}.png" alt="{{ review.username }}'s profile picture" onerror="this.onerror=null; this.src='/static/pfps/0.png';" width="70" height="70">
+                    {% else %}
+                        <img class="pfp" src="/static/pfps/0.png" alt="Default profile picture" width="70" height="70">
+                    {% endif %}
+                    
+                    <div class="review-content">
+                        <h3>{{ review.username }} - {{ review.game }}</h3>
+                        <p>{{ review.review_text }}</p>
+                        <p><strong>Rating:</strong>
+                            {% for i in range(1, review.score + 1) %}
+                                ★
+                            {% endfor %}
+                            {% for i in range(review.score + 1, 6) %}
+                                ☆
+                            {% endfor %}
+                        </p>
+                        <p><em>Reviewed on: {{ review.date }}</em></p>
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>
+</div>
+
 {% endblock %}
 
 {% block styles %}
     <style>
         .reviews-container {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 20px;
         }
 
-        .review {
+        .review-box {
             border: 1px solid #ccc;
             padding: 20px;
             border-radius: 8px;
@@ -67,24 +80,36 @@
             background-color: #f9f9f9;
         }
 
-        .review h3 {
+        .review-box h3 {
             margin: 0;
             font-size: 18px;
         }
 
-        .review p {
+        .review-box p {
             margin: 10px 0;
             font-size: 16px;
         }
 
-        .review strong {
+        .review-box strong {
             font-weight: bold;
         }
 
-        .review em {
+        .review-box em {
             font-style: italic;
             font-size: 14px;
         }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .pfp {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
     </style>
-</div>
 {% endblock %}

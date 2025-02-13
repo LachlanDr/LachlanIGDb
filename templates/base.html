@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="self'; script-src 'self'; style-src 'self'; img-src 'self';">
 
     <title>IGDb</title>
 
@@ -17,28 +17,31 @@
     <header>
         <h1 class="banner">IGDb</h1> 
         <nav>
-            <a href="/">Home</a>
-            <a href="/search">Search Games</a>
-            <a href="/reviews">All Reviews</a>
+            <a href="/">Home <img src="{{ url_for('static', filename='images/home.png') }}" alt="Login Icon" class="icon" /></a>
+            <a href="/search">Search Games <img src="{{ url_for('static', filename='images/search.png') }}" alt="Login Icon" class="icon" /></a>
+            <a href="/reviews">All Reviews <img src="{{ url_for('static', filename='images/users-alt.png') }}" alt="Login Icon" class="icon" /></a>
     
             {% if session.get('username') %}
-                <a href="/profile"><button>Profile</button></a>
-                <a href="/logout"><button>Logout</button></a>
-                <a href="/search?query"><button>Review</button></a>
+                <a href="/profile"><button><img src="{{ url_for('static', filename='images/login.png') }}" alt="Login Icon" class="icon" /> Profile</button></a>
+                <a href="/logout"><button><img src="{{ url_for('static', filename='images/logout.png') }}" alt="Logout Icon" class="icon" /> Logout</button></a>
+                <a href="/search?query"><button><img src="{{ url_for('static', filename='images/edit.png') }}" alt="Review Icon" class="icon" /> Review</button></a>
             {% else %}
-                <a href="/login"><button>Login</button></a>
-                <a href="/register"><button>Register</button></a>
+                <a href="/login"><button><img src="{{ url_for('static', filename='images/login.png') }}" alt="Login Icon" class="icon" /> Login</button></a>
+                <a href="/register"><button><img src="{{ url_for('static', filename='images/register.png') }}" alt="Register Icon" class="icon" /> Register</button></a>
             {% endif %}
         </nav>
     </header>
-    
 
     <main>
-        
         {% block content %}
         {% endblock %}
     </main>
-
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
+<footer class="footer">
+    <div class="footerContainer">
+        <p class="copyright">© Lachlan Dreyer 2025</p>
+    </div>
+</footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
 </html>

@@ -3,26 +3,49 @@
 {% block content %}
 <div class="review-box">
     <h2>Profile</h2>
-    
+
     <p>Welcome, <strong>{{ user.username }}</strong>!</p>
 
     <h3>Your Reviews</h3>
     {% if reviews %}
         <ul>
             {% for review in reviews %}
-                <li>
-                    <strong>{{ review.game }}</strong> ({{ review.date }})
-                    <br>Score: {{ review.score }}<br>
-                    {{ review.review_text }}
-                    <br>
+            <li class="review-box">
+                <h3>{{ review.username }} - {{ review.game }}</h3>
 
-                </li>
-                <hr>
+                <p>{{ review.review_text }}</p>
+                <p><strong>Rating:</strong>
+                    {% for i in range(1, review.score + 1) %}
+                        ★
+                    {% endfor %}
+                    {% for i in range(review.score + 1, 6) %}
+                        ☆
+                    {% endfor %}
+                </p>
+                <p><em>Reviewed on: {{ review.date }}</em></p>
+            </li>
             {% endfor %}
         </ul>
     {% else %}
         <p>You haven't written any reviews yet.</p>
     {% endif %}
+
+    <!-- <h3>Your Profile Picture</h3>
+    <form action="/update_pfp" method="post">
+        <div class="profile-pic-options">
+            {% for i in range(23) %}
+                <div class="profile-pic-item">
+                    <label for="pfp{{ i }}">
+                        <img src="/static/pfps/{{ i }}.png" alt="Profile Picture {{ i }}" width="50" class="profile-pic-img">
+                        <input type="radio" name="profile_picture" id="pfp{{ i }}" value="{{ i }}" {% if user.profile_picture == i %}checked{% endif %}>
+                    </label>
+                    <span>Profile Picture {{ i }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="profile_picture" value="{{ user.profile_picture }}">
+        <input type="submit" value="Update Profile Picture">
+    </form> -->
 
     <h3>Update Username</h3>
     <form action="/update_username" method="post">

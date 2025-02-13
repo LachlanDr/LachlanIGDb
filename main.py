@@ -36,8 +36,7 @@ def CheckLogin(username, password):
         return user
     return None
 
-def RegisterUser(username, password):
-    """Register a new user in the database."""
+def RegisterUser(username, password, pfp):
     if not username or not password:
         return False
 
@@ -48,7 +47,7 @@ def RegisterUser(username, password):
             return False
 
         hash = generate_password_hash(password)
-        db.execute("INSERT INTO Users(username, password) VALUES(?, ?)", (username, hash))
+        db.execute("INSERT INTO Users(username, password, profile_picture) VALUES(?, ?, ?)", (username, hash, pfp))
         db.commit()
     except sqlite3.DatabaseError as e:
         print(f"Database error: {e}")
@@ -71,11 +70,12 @@ def search_games(query):
     return [game for game in games if query.lower() in game.lower()]  
 
 def GetLatestReviews():
-    """Fetch the last 3 reviews from the database, ordered by date."""
+    """Fetch the last 3 reviews from the database, including the user's profile picture."""
     db = GetDB()
     try:
         reviews = db.execute(""" 
-            SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+            SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, 
+                   Users.username, Users.profile_picture 
             FROM Reviews 
             JOIN Users ON Reviews.user_id = Users.id 
             ORDER BY Reviews.date DESC 
@@ -87,6 +87,8 @@ def GetLatestReviews():
     finally:
         db.close()
     return reviews
+
+
 
 # //////////////////////////////
 # APP ROUTES: DISPLAY PAGES
@@ -146,30 +148,27 @@ def write_review(game_name):
         return redirect('/search')  
 
     return render_template('write_review.html', game_name=game_name)
-
 @app.route('/profile')
+
 def profile():
-    """Display the user's profile, including their reviews."""
     if 'id' not in session:
         flash("You need to be logged in to view your profile.", "danger")
         return redirect('/login')
-
-    user_id = session['id']
     
-    db = GetDB()
+    user_id = session['id']
+    db = GetDB()  # Initialize database connection first
+
     try:
+        user_info = db.execute("SELECT username, profile_picture FROM Users WHERE id = ?", (user_id,)).fetchone()
         user_reviews = db.execute(""" 
             SELECT Reviews.id, Reviews.date, Reviews.game, Reviews.review_text, Reviews.score 
             FROM Reviews
             WHERE user_id = ? 
             ORDER BY date DESC 
         """, (user_id,)).fetchall()
-        
-        user_info = db.execute("SELECT username FROM Users WHERE id = ?", (user_id,)).fetchone()
     except sqlite3.DatabaseError as e:
         print(f"Database error: {e}")
-        user_reviews = []
-        user_info = None
+        user_info, user_reviews = None, []
     finally:
         db.close()
     
@@ -189,7 +188,7 @@ def reviews():
     try:
         if query:
             all_reviews = db.execute(""" 
-                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username, Users.profile_picture 
                 FROM Reviews 
                 JOIN Users ON Reviews.user_id = Users.id 
                 WHERE LOWER(Reviews.game) LIKE ? 
@@ -199,7 +198,7 @@ def reviews():
             """, ('%' + query + '%', '%' + query + '%', '%' + query + '%')).fetchall()
         else:
             all_reviews = db.execute(""" 
-                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username 
+                SELECT Reviews.date, Reviews.game, Reviews.review_text, Reviews.score, Users.username, Users.profile_picture 
                 FROM Reviews 
                 JOIN Users ON Reviews.user_id = Users.id 
                 ORDER BY Reviews.date DESC 
@@ -212,6 +211,7 @@ def reviews():
         db.close()
     
     return render_template('reviews.html', reviews=all_reviews, query=query)
+
 
 @app.route('/update_username', methods=['POST'])
 def update_username():
@@ -240,6 +240,27 @@ def update_username():
         db.close()
 
     return redirect('/profile')
+@app.route('/update_pfp', methods=['POST'])
+def update_pfp():
+    if 'id' not in session:
+        flash("You need to be logged in to update your profile picture.", "danger")
+        return redirect('/login')
+
+    new_pfp = request.form.get('new_pfp', 0)  # Default to 0 if no value is passed
+
+    db = GetDB()
+    try:
+        db.execute("UPDATE Users SET profile_picture = ? WHERE id = ?", (new_pfp, session['id']))
+        db.commit()
+        flash("Profile picture updated!", "success")
+    except sqlite3.DatabaseError as e:
+        print(f"Database error: {e}")
+        flash("Error updating profile picture.", "danger")
+    finally:
+        db.close()
+
+    return redirect('/profile')
+
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
@@ -269,13 +290,19 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        profile_picture = request.form.get('profile_picture', 0) 
 
-        if RegisterUser(username, password):
-            flash('Account created successfully!', 'success')
+        if RegisterUser(username, password, profile_picture):
+            flash('Registration successful! You can now log in.', 'success')
             return redirect('/login')
         else:
-            flash('Username already exists or invalid input, please try again.', 'danger')
-    return render_template('register.html')
+            flash('Username already taken or error occurred.', 'danger')
+            return redirect('/register')
+    
+    return render_template('register.html') 
+
+    
+
 
 # //////////////////////////////
 # BEGIN

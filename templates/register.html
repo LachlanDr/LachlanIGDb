@@ -4,11 +4,25 @@
 <div class="review-box">
     <h2>Register</h2>
     <form action="/register" method="post">
-        
-        <label>Username: </label>
+        <label for="username">Username: </label>
         <input type="text" name="username" id="username" required>
-        <label>Password: </label>
+
+        <label for="password">Password: </label>
         <input type="password" name="password" id="password" required>
+
+        <h3>Select a Profile Picture</h3>
+        <div class="profile-pic-options">
+            {% for i in range(23) %}
+                <div class="profile-pic-item">
+                    <label for="pfp{{ i }}">
+                        <img src="/static/pfps/{{ i }}.png" alt="Profile Picture {{ i }}" width="50" class="profile-pic-img">
+                        <input type="radio" name="profile_picture" id="pfp{{ i }}" value="{{ i }}" required>
+                    </label>
+                    <span>Profile Picture {{ i }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
         <input type="submit" value="Register">
     </form>
 </div>
