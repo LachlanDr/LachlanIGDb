@@ -5,13 +5,17 @@
     <h2>Profile</h2>
 
     <p>Welcome, <strong>{{ user.username }}</strong>!</p>
+    <img src="/static/pfps/{{ user.profile_picture }}.png" alt="Profile Picture" width="100" class="profile-pic-img">
 
     <h3>Your Reviews</h3>
     {% if reviews %}
         <ul>
             {% for review in reviews %}
             <li class="review-box">
-                <h3>{{ review.username }} - {{ review.game }}</h3>
+                <div class="review-header">
+                    <img src="/static/pfps/{{ review.profile_picture }}.png" alt="Profile Picture" width="50" class="profile-pic-img">
+                    <h3>{{ review.username }} - {{ review.game }}</h3>
+                </div>
 
                 <p>{{ review.review_text }}</p>
                 <p><strong>Rating:</strong>
@@ -30,14 +34,14 @@
         <p>You haven't written any reviews yet.</p>
     {% endif %}
 
-    <!-- <h3>Your Profile Picture</h3>
+    <h3>Update Profile Picture</h3>
     <form action="/update_pfp" method="post">
         <div class="profile-pic-options">
             {% for i in range(23) %}
                 <div class="profile-pic-item">
                     <label for="pfp{{ i }}">
                         <img src="/static/pfps/{{ i }}.png" alt="Profile Picture {{ i }}" width="50" class="profile-pic-img">
-                        <input type="radio" name="profile_picture" id="pfp{{ i }}" value="{{ i }}" {% if user.profile_picture == i %}checked{% endif %}>
+                        <input type="radio" name="profile_picture" id="pfp{{ i }}" value="{{ i }}" {% if user.profile_picture == i %}checked{% endif %} required>
                     </label>
                     <span>Profile Picture {{ i }}</span>
                 </div>
@@ -46,7 +50,7 @@
         <input type="hidden" name="profile_picture" value="{{ user.profile_picture }}">
         <input type="submit" value="Update Profile Picture">
     </form> -->
-    
+
     <h3>Update Username</h3>
     <form action="/update_username" method="post">
         <input type="text" name="new_username" placeholder="New username" required>

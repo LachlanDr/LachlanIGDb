@@ -58,16 +58,21 @@ def RegisterUser(username, password, pfp):
     return True
 
 
-def load_games_from_txt(filename):
-    if os.path.exists(filename):
-        with open(filename, 'r', encoding='utf-8') as file:
+def load_games_from_txt():
+    """Dynamically find and load the games from the text file."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))  
+    txt_filename = "TextDump_GameOnly.txt"
+    txt_path = os.path.join(script_dir, txt_filename) 
+
+    if os.path.exists(txt_path):
+        with open(txt_path, 'r', encoding='utf-8') as file:
             games = file.readlines()
         return [game.strip() for game in games]
     return []
 
 def search_games(query):
-    games = load_games_from_txt("G:/My Drive/IST - 12/Assignment/Game Review/TextDump_GameOnly.txt")
-    return [game for game in games if query.lower() in game.lower()]  
+    games = load_games_from_txt()
+    return [game for game in games if query.lower() in game.lower()]
 
 def GetLatestReviews():
     """Fetch the last 3 reviews from the database, including the user's profile picture."""
@@ -149,15 +154,14 @@ def write_review(game_name):
 
     return render_template('write_review.html', game_name=game_name)
 @app.route('/profile')
-
 def profile():
     if 'id' not in session:
         flash("You need to be logged in to view your profile.", "danger")
         return redirect('/login')
-    
-    user_id = session['id']
-    db = GetDB()  # Initialize database connection first
 
+    user_id = session['id']
+    
+    db = GetDB()
     try:
         user_info = db.execute("SELECT username, profile_picture FROM Users WHERE id = ?", (user_id,)).fetchone()
         user_reviews = db.execute(""" 
@@ -173,6 +177,7 @@ def profile():
         db.close()
     
     return render_template('profile.html', user=user_info, reviews=user_reviews)
+
 
 @app.after_request
 def add_security_headers(response):
@@ -239,14 +244,18 @@ def update_username():
     finally:
         db.close()
 
-    return redirect('/profile')
 @app.route('/update_pfp', methods=['POST'])
 def update_pfp():
     if 'id' not in session:
         flash("You need to be logged in to update your profile picture.", "danger")
         return redirect('/login')
 
-    new_pfp = request.form.get('new_pfp', 0)  # Default to 0 if no value is passed
+    new_pfp = request.form.get('profile_picture', 0)  # Default to 0 if no selection
+    print(f"Received profile picture: {new_pfp}")  # Debugging line
+
+    if not new_pfp:
+        flash("Please select a profile picture.", "danger")
+        return redirect('/profile')
 
     db = GetDB()
     try:
